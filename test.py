@@ -47,7 +47,7 @@ def register_one_scene(inlier_ratio_threshold, distance_threshold, save_path, re
                 target_score = get_scores(scorepath, cloud_bin_t, 'D3Feat').squeeze()
                 source_desc = np.nan_to_num(source_desc)
                 target_desc = np.nan_to_num(target_desc)
-                
+
                 # randomly select 5000 keypts
                 if args.random_points:
                     source_indices = np.random.choice(range(source_keypts.shape[0]), args.num_points)
@@ -59,7 +59,7 @@ def register_one_scene(inlier_ratio_threshold, distance_threshold, save_path, re
                 source_desc = source_desc[source_indices, :]
                 target_keypts = target_keypts[target_indices, :]
                 target_desc = target_desc[target_indices, :]
-                
+
                 corr = build_correspondence(source_desc, target_desc)
 
                 gt_trans = gtLog[key]
@@ -94,7 +94,7 @@ def generate_features(model, dloader, config, chosen_snapshot):
         os.mkdir(keypoint_path)
     if not os.path.exists(score_path):
         os.mkdir(score_path)
-    
+
     # generate descriptors
     recall_list = []
     for scene in dset.scene_list:
@@ -126,7 +126,7 @@ def generate_features(model, dloader, config, chosen_snapshot):
             np.save(f'{keypoint_path_scene}/cloud_bin_{ids}', pts.detach().cpu().numpy().astype(np.float32))
             np.save(f'{score_path_scene}/cloud_bin_{ids}', scores.detach().cpu().numpy().astype(np.float32))
             print(f"Generate cloud_bin_{ids} for {scene}")
-    
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -141,17 +141,17 @@ if __name__ == '__main__':
         log_filename = f'geometric_registration/{args.chosen_snapshot}-rand-{args.num_points}.log'
     else:
         log_filename = f'geometric_registration/{args.chosen_snapshot}-pred-{args.num_points}.log'
-    logging.basicConfig(level=logging.INFO, 
-        filename=log_filename, 
-        filemode='w', 
+    logging.basicConfig(level=logging.INFO,
+        filename=log_filename,
+        filemode='w',
         format="")
 
 
-    config_path = f'/data/D3Feat/snapshot/{args.chosen_snapshot}/config.json'
+    config_path = f'/content/drive/MyDrive/3DMatch_output/D3Feat/snapshot/{args.chosen_snapshot}/config.json'
     config = json.load(open(config_path, 'r'))
     config = edict(config)
 
-    # create model 
+    # create model
     config.architecture = [
         'simple',
         'resnetb',
@@ -173,12 +173,12 @@ if __name__ == '__main__':
     # module = importlib.util.module_from_spec(module_spec)
     # module_spec.loader.exec_module(module)
     # model = module.KPFCNN(config)
-    
+
     # if test on datasets with different scale
     # config.first_subsampling_dl = [new voxel size for first layer]
-    
+
     model = KPFCNN(config)
-    model.load_state_dict(torch.load(f'/data/D3Feat/snapshot/{args.chosen_snapshot}/models/model_best_acc.pth')['state_dict'])
+    model.load_state_dict(torch.load(f'/content/drive/MyDrive/3DMatch_output/D3Feat/snapshot/{args.chosen_snapshot}/models/model_best_acc.pth')['state_dict'])
     print(f"Load weight from snapshot/{args.chosen_snapshot}/models/model_best_acc.pth")
     model.eval()
 
@@ -219,7 +219,7 @@ if __name__ == '__main__':
         p = Process(target=register_one_scene, args=(args.inlier_ratio_threshold, args.distance_threshold, save_path, return_dict, scene))
         jobs.append(p)
         p.start()
-    
+
     for proc in jobs:
         proc.join()
 

@@ -1,4 +1,4 @@
-data/*
+g-data/*
 kernels/*.ply
 snapshot/*
 tensorboard/*
@@ -14,3 +14,4 @@ geometric_registration/*.log
 geometric_registration/gt_result/
 geometric_registration/pred_result/
 D3Feat_temp/*
+datasets/

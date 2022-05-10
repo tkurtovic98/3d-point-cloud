@@ -19,10 +19,10 @@ def str2bool(v):
 experiment_id = "D3Feat" + time.strftime('%m%d%H%M')
 # snapshot configurations
 snapshot_arg = add_argument_group('Snapshot')
-snapshot_arg.add_argument('--snapshot_dir', type=str, default=f'/data/D3Feat/snapshot/{experiment_id}')
-snapshot_arg.add_argument('--tboard_dir', type=str, default=f'/data/D3Feat/tensorboard/{experiment_id}')
+snapshot_arg.add_argument('--snapshot_dir', type=str, default=f'/content/drive/MyDrive/3DMatch_output/D3Feat/snapshot/{experiment_id}')
+snapshot_arg.add_argument('--tboard_dir', type=str, default=f'/content/drive/MyDrive/3DMatch_output/D3Feat/tensorboard/{experiment_id}')
 snapshot_arg.add_argument('--snapshot_interval', type=int, default=100)
-snapshot_arg.add_argument('--save_dir', type=str, default=os.path.join(f'/data/D3Feat/snapshot/{experiment_id}', 'models/'))
+snapshot_arg.add_argument('--save_dir', type=str, default=os.path.join(f'/content/drive/MyDrive/3DMatch_output/D3Feat/snapshot/{experiment_id}', 'models/'))
 
 # Network configurations
 net_arg = add_argument_group('Network')
@@ -44,7 +44,7 @@ net_arg.add_argument('--use_batch_norm', type=str2bool, default=False)
 net_arg.add_argument('--batch_norm_momentum', type=float, default=0.02)
 net_arg.add_argument('--deformable', type=str2bool, default=False)
 net_arg.add_argument('--modulated', type=str2bool, default=False)
- 
+
 # Loss configurations
 loss_arg = add_argument_group('Loss')
 loss_arg.add_argument('--dist_type', type=str, default='euclidean')
@@ -74,13 +74,13 @@ opt_arg.add_argument('--grad_clip_norm', type=float, default=100.0)
 
 # Dataset and dataloader configurations
 data_arg = add_argument_group('Data')
-data_arg.add_argument('--root', type=str, default='/data/3DMatch/')
+data_arg.add_argument('--root', type=str, default='./3DMatch/')
 data_arg.add_argument('--num_node', type=int, default=128)
 data_arg.add_argument('--downsample', type=float, default=0.03)
 data_arg.add_argument('--self_augment', type=str2bool, default=False)
 data_arg.add_argument('--augment_noise', type=float, default=0.005)
 data_arg.add_argument('--augment_axis', type=int, default=1)
-data_arg.add_argument('--augment_rotation', type=float, default=1.0, help='rotation angle = num * 2pi') 
+data_arg.add_argument('--augment_rotation', type=float, default=1.0, help='rotation angle = num * 2pi')
 data_arg.add_argument('--augment_translation', type=float, default=0.5, help='translation = num (m)')
 data_arg.add_argument('--batch_size', type=int, default=1)
 data_arg.add_argument('--num_workers', type=int, default=16)
