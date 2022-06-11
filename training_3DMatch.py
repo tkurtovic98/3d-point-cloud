@@ -1,7 +1,7 @@
 import os
 import time
 import shutil
-import json 
+import json
 from config import get_config
 from easydict import EasyDict as edict
 from datasets.ThreeDMatch import ThreeDMatchDataset, ThreeDMatchTestset
@@ -39,8 +39,8 @@ if __name__ == '__main__':
         config.device = torch.device('cuda')
     else:
         config.device = torch.device('cpu')
-    
-    # create model 
+
+    # create model
     config.architecture = [
         'simple',
         'resnetb',
@@ -57,29 +57,29 @@ if __name__ == '__main__':
     print("Network Architecture:\n", "".join([layer+'\n' for layer in config.architecture]))
 
     config.model = KPFCNN(config)
-    
-    # create optimizer 
+
+    # create optimizer
     if config.optimizer == 'SGD':
         config.optimizer = optim.SGD(
-            config.model.parameters(), 
+            config.model.parameters(),
             lr=config.lr,
             momentum=config.momentum,
             weight_decay=config.weight_decay,
             )
     elif config.optimizer == 'ADAM':
         config.optimizer = optim.Adam(
-            config.model.parameters(), 
+            config.model.parameters(),
             lr=config.lr,
             betas=(0.9, 0.999),
             # momentum=config.momentum,
             weight_decay=config.weight_decay,
         )
-    
+
     config.scheduler = optim.lr_scheduler.ExponentialLR(
         config.optimizer,
         gamma=config.scheduler_gamma,
     )
-    
+
     # create dataset and dataloader
     train_set = ThreeDMatchDataset(root=config.root,
                                         split='train',
@@ -87,7 +87,7 @@ if __name__ == '__main__':
                                         self_augment=config.self_augment,
                                         num_node=config.num_node,
                                         augment_noise=config.augment_noise,
-                                        augment_axis=config.augment_axis, 
+                                        augment_axis=config.augment_axis,
                                         augment_rotation=config.augment_rotation,
                                         augment_translation=config.augment_translation,
                                         config=config,
@@ -98,7 +98,7 @@ if __name__ == '__main__':
                                     downsample=config.downsample,
                                     self_augment=config.self_augment,
                                     augment_noise=config.augment_noise,
-                                    augment_axis=config.augment_axis, 
+                                    augment_axis=config.augment_axis,
                                     augment_rotation=config.augment_rotation,
                                     augment_translation=config.augment_translation,
                                     config=config,
@@ -114,13 +114,13 @@ if __name__ == '__main__':
                                         num_workers=config.num_workers,
                                         neighborhood_limits=neighborhood_limits
                                         )
-    
+
     # create evaluation
     if config.desc_loss == 'contrastive':
         desc_loss = ContrastiveLoss(
             pos_margin=config.pos_margin,
             neg_margin=config.neg_margin,
-            metric='euclidean', 
+            metric='euclidean',
             safe_radius=config.safe_radius
             )
     else:
@@ -130,8 +130,8 @@ if __name__ == '__main__':
             safe_radius=config.safe_radius,
             pos_margin=config.pos_margin,
             neg_margin=config.neg_margin,
-        ) 
-    
+        )
+
     config.evaluation_metric = {
         'desc_loss': desc_loss,
         'det_loss': DetLoss(metric='euclidean'),
@@ -140,6 +140,6 @@ if __name__ == '__main__':
         'desc_loss': config.desc_loss_weight,
         'det_loss': config.det_loss_weight,
     }
-    
+
     trainer = Trainer(config)
     trainer.train()

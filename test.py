@@ -114,9 +114,9 @@ def generate_features(model, dloader, config, chosen_snapshot):
             inputs = dataloader_iter.next()
             for k, v in inputs.items():  # load inputs to device.
                 if type(v) == list:
-                    inputs[k] = [item.cuda() for item in v]
+                    inputs[k] = [item.cpu() for item in v]
                 else:
-                    inputs[k] = v.cuda()
+                    inputs[k] = v.cpu()
             features, scores = model(inputs)
             pcd_size = inputs['stack_lengths'][0][0]
             pts = inputs['points'][0][:int(pcd_size)]
@@ -136,6 +136,7 @@ if __name__ == '__main__':
     parser.add_argument('--random_points', default=False, action='store_true')
     parser.add_argument('--num_points', default=250, type=int)
     parser.add_argument('--generate_features', default=False, action='store_true')
+    parser.add_argument('--features-only', default=True, action='store_true')
     args = parser.parse_args()
     if args.random_points:
         log_filename = f'geometric_registration/{args.chosen_snapshot}-rand-{args.num_points}.log'
@@ -147,7 +148,7 @@ if __name__ == '__main__':
         format="")
 
 
-    config_path = f'/content/drive/MyDrive/3DMatch_output/D3Feat/snapshot/{args.chosen_snapshot}/config.json'
+    config_path = f'./3DMatch_output/D3Feat/snapshot/{args.chosen_snapshot}/config.json'
     config = json.load(open(config_path, 'r'))
     config = edict(config)
 
@@ -178,7 +179,7 @@ if __name__ == '__main__':
     # config.first_subsampling_dl = [new voxel size for first layer]
 
     model = KPFCNN(config)
-    model.load_state_dict(torch.load(f'/content/drive/MyDrive/3DMatch_output/D3Feat/snapshot/{args.chosen_snapshot}/models/model_best_acc.pth')['state_dict'])
+    model.load_state_dict(torch.load(f'./3DMatch_output/D3Feat/snapshot/{args.chosen_snapshot}/models/model_best_acc.pth', map_location=torch.device('cpu'))['state_dict'])
     print(f"Load weight from snapshot/{args.chosen_snapshot}/models/model_best_acc.pth")
     model.eval()
 
@@ -199,7 +200,7 @@ if __name__ == '__main__':
                                     shuffle=False,
                                     num_workers=config.num_workers,
                                     )
-        generate_features(model.cuda(), dloader, config, args.chosen_snapshot)
+        generate_features(model.cpu(), dloader, config, args.chosen_snapshot)
 
     # register each pair of fragments in scenes using multiprocessing.
     scene_list = [
